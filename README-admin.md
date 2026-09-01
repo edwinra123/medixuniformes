@@ -19,7 +19,7 @@ En **SQL Editor**, ejecuta en este orden:
 2. [`supabase/seed.sql`](supabase/seed.sql) (solo categorias)
 3. [`supabase/storage.sql`](supabase/storage.sql) (bucket de fotos)
 4. Si ya tenias productos de prueba: [`supabase/clear-products.sql`](supabase/clear-products.sql)
-5. Pagos Wompi: [`supabase/payments.sql`](supabase/payments.sql) + guia [`README-wompi.md`](README-wompi.md)
+5. Pagos Wompi Fase 1: [`supabase/payments.sql`](supabase/payments.sql) + [`supabase/phase1-payments.sql`](supabase/phase1-payments.sql) + guia [`README-wompi.md`](README-wompi.md)
 
 ## 3. Administrador por correo
 

@@ -1,7 +1,7 @@
 let products = [];
 const cart = [];
 const whatsappBusinessNumber = "573001112233";
-const SHIPPING_COST = 9900;
+let SHIPPING_COST = 9900;
 const placeholderImage =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -101,6 +101,39 @@ async function restGet(path) {
     throw new Error(`Supabase ${res.status}: ${text.slice(0, 180)}`);
   }
   return res.json();
+}
+
+async function rpcCall(fnName, body = {}) {
+  const cfg = getSupabaseConfig();
+  if (!cfg.url || !cfg.anonKey) {
+    throw new Error("Falta config.js con url y anonKey");
+  }
+  const res = await fetch(`${cfg.url}/rest/v1/rpc/${fnName}`, {
+    method: "POST",
+    headers: {
+      ...supabaseHeaders(),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase RPC ${res.status}: ${text.slice(0, 180)}`);
+  }
+  return res.json();
+}
+
+async function loadCheckoutSettings() {
+  try {
+    const data = await rpcCall("get_checkout_settings");
+    const cost = Number(data?.shippingCost);
+    if (Number.isFinite(cost) && cost >= 0) {
+      SHIPPING_COST = cost;
+      renderCart();
+    }
+  } catch (err) {
+    console.warn("No se pudo cargar configuracion de checkout:", err);
+  }
 }
 
 function createClient() {
@@ -600,6 +633,8 @@ async function saveCashOnDeliveryOrder(customer, orderId) {
         status: "pending",
         payment_method: "cash_on_delivery",
         payment_status: "cod",
+        subtotal: getSubtotal(),
+        shipping_cost: getShipping(),
         total: getTotal()
       })
     });
@@ -844,4 +879,5 @@ if (checkoutForm && paymentMethodEl && orderResultEl) {
 }
 
 renderCart();
+loadCheckoutSettings();
 loadProductsFromSupabase();

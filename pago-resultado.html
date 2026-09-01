@@ -6,10 +6,14 @@
   <title>Medix Uniformes | Resultado del pago</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="home-page">
+<body class="home-page payment-result-page">
+  <div class="announce-bar">
+    Envios a toda Colombia · Pagos seguros · Calidad premium
+  </div>
+
   <header class="topbar">
     <a class="brand" href="index.html">
       <span class="logo">Medix</span>
@@ -18,28 +22,87 @@
     <nav class="home-nav">
       <a href="index.html">Inicio</a>
       <a href="catalogo.html">Catalogo</a>
+      <a href="index.html#nosotros">Nosotras</a>
+      <a href="index.html#contacto">Contacto</a>
     </nav>
+    <div class="home-actions">
+      <a class="icon-link account-link" href="cuenta.html" aria-label="Mi cuenta" title="Mi cuenta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5 19.5c1.2-3.2 3.7-5 7-5s5.8 1.8 7 5"/>
+        </svg>
+      </a>
+      <a class="icon-link" href="catalogo.html" aria-label="Buscar">⌕</a>
+    </div>
   </header>
 
-  <main class="payment-result">
-    <h1 id="pay-title">Verificando pago...</h1>
-    <p id="pay-message">Estamos confirmando tu transaccion con Wompi.</p>
-    <p id="pay-meta" class="payment-meta"></p>
-    <a class="cta-btn" href="catalogo.html">Volver al catalogo</a>
+  <main class="payment-result-main">
+    <article id="payment-card" class="payment-result-card is-loading">
+      <div id="pay-icon" class="payment-result-icon" aria-hidden="true">⏳</div>
+      <p class="payment-result-kicker">Resultado del pago</p>
+      <h1 id="pay-title">Verificando pago...</h1>
+      <p id="pay-message" class="payment-result-lead">Estamos confirmando tu transaccion con Wompi.</p>
+
+      <dl id="pay-details" class="payment-result-details hidden">
+        <div><dt>Referencia</dt><dd id="pay-reference">—</dd></div>
+        <div><dt>Monto</dt><dd id="pay-amount">—</dd></div>
+        <div><dt>Estado</dt><dd id="pay-status">—</dd></div>
+      </dl>
+
+      <p id="pay-meta" class="payment-meta"></p>
+
+      <div class="payment-result-actions">
+        <a id="pay-primary-btn" class="btn-accent" href="catalogo.html">Volver al catalogo</a>
+        <a id="pay-secondary-btn" class="btn-outline hidden" href="https://www.instagram.com/medix.uniformes/" target="_blank" rel="noopener noreferrer">Escribenos en Instagram</a>
+      </div>
+    </article>
   </main>
 
-  <script src="config.js?v=7"></script>
+  <footer class="home-footer">
+    <a href="https://www.instagram.com/medix.uniformes/"><span>@medix.uniformes</span></a>
+    <span>Compra segura</span>
+    <span>Colombia</span>
+  </footer>
+
+  <script src="config.js?v=10"></script>
   <script>
     (async function () {
+      const cardEl = document.getElementById("payment-card");
+      const iconEl = document.getElementById("pay-icon");
       const titleEl = document.getElementById("pay-title");
       const messageEl = document.getElementById("pay-message");
       const metaEl = document.getElementById("pay-meta");
+      const detailsEl = document.getElementById("pay-details");
+      const referenceEl = document.getElementById("pay-reference");
+      const amountEl = document.getElementById("pay-amount");
+      const statusEl = document.getElementById("pay-status");
+      const primaryBtn = document.getElementById("pay-primary-btn");
+      const secondaryBtn = document.getElementById("pay-secondary-btn");
+
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
 
+      function setState(state, icon, title, message) {
+        cardEl.className = "payment-result-card is-" + state;
+        iconEl.textContent = icon;
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        detailsEl.classList.remove("hidden");
+      }
+
+      function formatMoney(cents) {
+        if (cents == null) return "—";
+        return "$" + (Number(cents) / 100).toLocaleString("es-CO");
+      }
+
       if (!id) {
-        titleEl.textContent = "Sin transaccion";
-        messageEl.textContent = "No encontramos el id de pago en la URL.";
+        setState(
+          "error",
+          "⚠",
+          "Sin transaccion",
+          "No encontramos el ID de pago en la URL. Si ya pagaste, revisa tu correo o contactanos."
+        );
+        secondaryBtn.classList.remove("hidden");
         return;
       }
 
@@ -56,33 +119,58 @@
         const tx = json?.data;
         const status = String(tx?.status || "").toUpperCase();
 
+        referenceEl.textContent = tx?.reference || "—";
+        amountEl.textContent = formatMoney(tx?.amount_in_cents);
+        statusEl.textContent = status || "DESCONOCIDO";
+
         if (status === "APPROVED") {
-          titleEl.textContent = "Pago aprobado";
-          messageEl.textContent =
-            "Gracias por tu compra. Referencia: " + (tx.reference || "—");
+          setState(
+            "success",
+            "✓",
+            "Pago aprobado",
+            "Gracias por tu compra. Estamos preparando tu pedido y pronto recibiras novedades."
+          );
+          primaryBtn.textContent = "Seguir comprando";
+          primaryBtn.href = "catalogo.html";
         } else if (status === "PENDING" || status === "PENDING_PAYMENT") {
-          titleEl.textContent = "Pago en proceso";
-          messageEl.textContent =
-            "Tu pago aun no esta confirmado. Te avisaremos cuando Wompi lo apruebe.";
-        } else if (status === "DECLINED") {
-          titleEl.textContent = "Pago rechazado";
-          messageEl.textContent = "La transaccion no pudo completarse. Intenta de nuevo.";
+          setState(
+            "pending",
+            "⏳",
+            "Pago en proceso",
+            "Tu pago aun no esta confirmado. Si ya completaste el pago, espera unos minutos."
+          );
+          primaryBtn.textContent = "Volver al catalogo";
+        } else if (status === "DECLINED" || status === "VOIDED") {
+          setState(
+            "error",
+            "✕",
+            "Pago no completado",
+            "La transaccion fue rechazada o cancelada. Puedes intentar de nuevo."
+          );
+          primaryBtn.textContent = "Intentar de nuevo";
+          primaryBtn.href = "catalogo.html";
+          secondaryBtn.classList.remove("hidden");
         } else {
-          titleEl.textContent = "Estado: " + (status || "desconocido");
-          messageEl.textContent = "Referencia: " + (tx?.reference || "—");
+          setState(
+            "pending",
+            "?",
+            "Estado: " + (status || "desconocido"),
+            "Guarda tu referencia por si necesitas ayuda."
+          );
+          secondaryBtn.classList.remove("hidden");
         }
 
         if (tx?.reference) {
-          metaEl.textContent =
-            "ID Wompi: " + id + " · Referencia: " + tx.reference +
-            (tx.amount_in_cents != null
-              ? " · Monto: $" + (tx.amount_in_cents / 100).toLocaleString("es-CO")
-              : "");
+          metaEl.textContent = "ID Wompi: " + id;
         }
       } catch (err) {
-        titleEl.textContent = "No se pudo verificar";
-        messageEl.textContent =
-          "Guarda el ID de la transaccion y contactanos si ya pagaste.";
+        setState(
+          "error",
+          "⚠",
+          "No se pudo verificar",
+          "Guarda el ID de la transaccion y contactanos si ya pagaste."
+        );
+        secondaryBtn.classList.remove("hidden");
         console.error(err);
       }
     })();
