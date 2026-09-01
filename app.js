@@ -596,6 +596,23 @@ function openWompiWidget(checkoutData) {
   });
 }
 
+function buildPaymentResultUrl(checkoutData, transaction) {
+  const params = new URLSearchParams();
+  if (transaction?.id) {
+    params.set("id", String(transaction.id));
+  } else if (checkoutData?.reference) {
+    params.set("ref", checkoutData.reference);
+  }
+  return params.toString() ? `pago-resultado.html?${params.toString()}` : null;
+}
+
+function redirectToPaymentResult(checkoutData, transaction) {
+  const url = buildPaymentResultUrl(checkoutData, transaction);
+  if (!url) return false;
+  window.location.href = url;
+  return true;
+}
+
 async function saveCashOnDeliveryOrder(customer, orderId) {
   const cfg = getSupabaseConfig();
   if (!cfg.url || !cfg.anonKey) return;
@@ -818,30 +835,20 @@ if (checkoutForm && paymentMethodEl && orderResultEl) {
         const checkoutData = await createWompiCheckout(customer);
         const transaction = await openWompiWidget(checkoutData);
 
-        orderResultEl.classList.remove("hidden");
         if (transaction?.status === "APPROVED") {
-          orderResultEl.innerHTML = `
-            <h3>Pago aprobado</h3>
-            <p><strong>Referencia:</strong> ${checkoutData.reference}</p>
-            <p><strong>ID Wompi:</strong> ${transaction.id || "—"}</p>
-            <p>Gracias por tu compra. Pronto prepararemos tu envio.</p>
-          `;
           cart.length = 0;
           renderCart();
-          checkoutForm.reset();
-        } else if (transaction) {
-          orderResultEl.innerHTML = `
-            <h3>Pago: ${transaction.status || "pendiente"}</h3>
-            <p><strong>Referencia:</strong> ${checkoutData.reference}</p>
-            <p><strong>ID Wompi:</strong> ${transaction.id || "—"}</p>
-            <p>Si ya pagaste, espera la confirmacion. Tambien puedes revisar el resultado en la pagina de retorno.</p>
-          `;
-        } else {
-          orderResultEl.innerHTML = `
-            <h3>Checkout abierto</h3>
-            <p>Referencia <strong>${checkoutData.reference}</strong>. Completa el pago en el widget de Wompi.</p>
-          `;
         }
+
+        if (redirectToPaymentResult(checkoutData, transaction)) {
+          return;
+        }
+
+        orderResultEl.classList.remove("hidden");
+        orderResultEl.innerHTML = `
+          <h3>Pago no completado</h3>
+          <p>No pudimos obtener el resultado del pago. Intenta de nuevo desde el catalogo.</p>
+        `;
       }
     } catch (err) {
       console.error(err);
