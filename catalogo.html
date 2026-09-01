@@ -51,36 +51,17 @@
       <aside class="catalog-filters">
         <div class="filter-block">
           <h3 class="filter-title">Categorias</h3>
-          <ul class="filter-list">
-            <li><button class="filter-link is-active" type="button">Todos <span>0</span></button></li>
-            <li><button class="filter-link" type="button">Sets clinicos <span>0</span></button></li>
-            <li><button class="filter-link" type="button">Blusas <span>0</span></button></li>
-            <li><button class="filter-link" type="button">Pantalones <span>0</span></button></li>
-            <li><button class="filter-link" type="button">Conjuntos premium <span>0</span></button></li>
-          </ul>
+          <ul class="filter-list" id="filter-categories"></ul>
         </div>
 
         <div class="filter-block">
           <h3 class="filter-title">Colores</h3>
-          <ul class="filter-colors">
-            <li><span class="swatch" style="background:#e91e8c;"></span> Fucsia <em>0</em></li>
-            <li><span class="swatch" style="background:#9caf88;"></span> Verde menta <em>0</em></li>
-            <li><span class="swatch" style="background:#7eb6d9;"></span> Azul cielo <em>0</em></li>
-            <li><span class="swatch" style="background:#a85d4b;"></span> Terracota <em>0</em></li>
-            <li><span class="swatch" style="background:#d4a843;"></span> Mostaza <em>0</em></li>
-          </ul>
+          <ul class="filter-colors" id="filter-colors"></ul>
         </div>
 
         <div class="filter-block">
           <h3 class="filter-title">Tallas</h3>
-          <div class="size-grid">
-            <button type="button">XS</button>
-            <button type="button">S</button>
-            <button type="button">M</button>
-            <button type="button">L</button>
-            <button type="button">XL</button>
-            <button type="button">XXL</button>
-          </div>
+          <div class="size-grid" id="filter-sizes"></div>
         </div>
 
         <div class="filter-block">
@@ -101,10 +82,10 @@
           <div class="catalog-toolbar-right">
             <label class="sort-label">
               <select id="catalog-sort">
-                <option>Mas vendidos</option>
-                <option>Precio: menor a mayor</option>
-                <option>Precio: mayor a menor</option>
-                <option>Nombre A-Z</option>
+                <option value="popular">Mas vendidos</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="name-asc">Nombre A-Z</option>
               </select>
             </label>
           </div>
@@ -112,14 +93,7 @@
 
         <div id="product-list" class="catalog-grid"></div>
 
-        <div class="catalog-pagination" id="catalog-pagination" hidden>
-          <button type="button" class="page-btn page-nav" aria-label="Anterior">‹</button>
-          <button type="button" class="page-btn is-active">1</button>
-          <button type="button" class="page-btn">2</button>
-          <button type="button" class="page-btn">3</button>
-          <button type="button" class="page-btn">4</button>
-          <button type="button" class="page-btn page-nav" aria-label="Siguiente">›</button>
-        </div>
+        <div class="catalog-pagination" id="catalog-pagination" hidden></div>
       </section>
     </div>
 
@@ -284,7 +258,7 @@
   </div>
 
   <script src="https://checkout.wompi.co/widget.js"></script>
-  <script src="config.js?v=15"></script>
-  <script src="app.js?v=15"></script>
+  <script src="config.js?v=16"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>

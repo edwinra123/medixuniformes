@@ -2287,11 +2287,29 @@ input:focus, select:focus, textarea:focus {
 }
 
 .filter-colors li {
+  display: block;
+}
+
+.filter-color-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  border: 0;
+  background: transparent;
   color: #5b5560;
+  font-family: var(--font-main);
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filter-color-btn.is-active,
+.filter-color-btn:hover {
+  background: #f4ebe6;
+  color: var(--color-dark);
 }
 
 .filter-colors .swatch,
@@ -2521,6 +2539,11 @@ input:focus, select:focus, textarea:focus {
 .page-btn.page-nav {
   font-size: 18px;
   color: #9a94a0;
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1100px) {
