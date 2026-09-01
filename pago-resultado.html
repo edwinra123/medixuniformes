@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medix Uniformes | Resultado del pago</title>
+  <title>Medix Uniformes | Confirmacion de pedido</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="home-page payment-result-page">
+<body class="home-page confirm-page">
   <div class="announce-bar">
     Envios a toda Colombia · Pagos seguros · Calidad premium
   </div>
@@ -23,6 +23,7 @@
       <a href="index.html">Inicio</a>
       <a href="catalogo.html">Catalogo</a>
       <a href="index.html#nosotros">Nosotras</a>
+      <a href="index.html#envios">Envios</a>
       <a href="index.html#contacto">Contacto</a>
     </nav>
     <div class="home-actions">
@@ -33,147 +34,166 @@
         </svg>
       </a>
       <a class="icon-link" href="catalogo.html" aria-label="Buscar">⌕</a>
+      <a class="icon-link cart-link" href="catalogo.html" aria-label="Carrito">
+        👜
+        <span class="cart-badge">0</span>
+      </a>
     </div>
   </header>
 
-  <main class="payment-result-main">
-    <article id="payment-card" class="payment-result-card is-loading">
-      <div id="pay-icon" class="payment-result-icon" aria-hidden="true">⏳</div>
-      <p class="payment-result-kicker">Resultado del pago</p>
-      <h1 id="pay-title">Verificando pago...</h1>
-      <p id="pay-message" class="payment-result-lead">Estamos confirmando tu transaccion con Wompi.</p>
+  <main class="confirm-main">
+    <section id="confirm-loading" class="confirm-loading">
+      <div class="confirm-spinner"></div>
+      <p>Verificando tu pago...</p>
+    </section>
 
-      <dl id="pay-details" class="payment-result-details hidden">
-        <div><dt>Referencia</dt><dd id="pay-reference">—</dd></div>
-        <div><dt>Monto</dt><dd id="pay-amount">—</dd></div>
-        <div><dt>Estado</dt><dd id="pay-status">—</dd></div>
-      </dl>
+    <section id="confirm-error" class="confirm-error hidden">
+      <div class="confirm-error-icon">!</div>
+      <h1 id="error-title">Sin transaccion</h1>
+      <p id="error-message"></p>
+      <a class="btn-accent" href="catalogo.html">Volver al catalogo</a>
+    </section>
 
-      <p id="pay-meta" class="payment-meta"></p>
+    <div id="confirm-content" class="confirm-content hidden">
+      <section class="confirm-hero">
+        <div class="confirm-check" aria-hidden="true">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="27" stroke="#a68979" stroke-width="1.5"/>
+            <path d="M17 28.5L24.5 36L39 20" stroke="#a68979" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1 id="hero-title">¡Gracias por tu compra!</h1>
+        <p id="hero-lead" class="confirm-hero-lead">
+          Tu pedido ha sido recibido correctamente. Te enviaremos un correo con los detalles de tu compra.
+        </p>
 
-      <div class="payment-result-actions">
-        <a id="pay-primary-btn" class="btn-accent" href="catalogo.html">Volver al catalogo</a>
-        <a id="pay-secondary-btn" class="btn-outline hidden" href="https://www.instagram.com/medix.uniformes/" target="_blank" rel="noopener noreferrer">Escribenos en Instagram</a>
-      </div>
-    </article>
+        <div class="confirm-meta-grid">
+          <article class="confirm-meta-card">
+            <span>Numero de pedido</span>
+            <strong id="order-code">#—</strong>
+          </article>
+          <article class="confirm-meta-card">
+            <span>Fecha</span>
+            <strong id="order-date">—</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="confirm-timeline-wrap">
+        <ol id="order-timeline" class="confirm-timeline">
+          <li class="confirm-step is-done" data-step="1">
+            <div class="confirm-step-icon">📋</div>
+            <strong>Pedido recibido</strong>
+            <span id="step-date">—</span>
+          </li>
+          <li class="confirm-step" data-step="2">
+            <div class="confirm-step-icon">📦</div>
+            <strong>En preparacion</strong>
+          </li>
+          <li class="confirm-step" data-step="3">
+            <div class="confirm-step-icon">🚚</div>
+            <strong>En camino</strong>
+          </li>
+          <li class="confirm-step" data-step="4">
+            <div class="confirm-step-icon">✓</div>
+            <strong>Entregado</strong>
+          </li>
+        </ol>
+      </section>
+
+      <section class="confirm-info-bar">
+        <article>
+          <span class="confirm-info-icon">🚚</span>
+          <div>
+            <strong>Envio a todo Colombia</strong>
+            <p>Enviaremos tu pedido tan pronto este listo.</p>
+          </div>
+        </article>
+        <article>
+          <span class="confirm-info-icon is-wa">💬</span>
+          <div>
+            <strong>¿Dudas sobre tu pedido?</strong>
+            <p>Escribenos por WhatsApp</p>
+            <a id="wa-link" href="#" target="_blank" rel="noopener noreferrer">310 123 4567</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="confirm-summary">
+        <div class="confirm-summary-head">
+          <h2>Resumen de tu pedido</h2>
+          <a href="#order-items">Ver detalle del pedido →</a>
+        </div>
+
+        <div id="order-items" class="confirm-items"></div>
+
+        <div class="confirm-totals">
+          <div><span>Subtotal</span><span id="summary-subtotal">$0</span></div>
+          <div><span>Envio</span><span id="summary-shipping">$0</span></div>
+          <div class="confirm-total-row"><span>Total pagado</span><strong id="summary-total">$0</strong></div>
+        </div>
+
+        <div class="confirm-pay-row">
+          <div class="confirm-wompi-logo">wompi</div>
+          <div class="confirm-pay-copy">
+            <strong id="pay-method">Pago en linea (Wompi)</strong>
+          </div>
+          <span id="pay-badge" class="confirm-pay-badge is-approved">Aprobado</span>
+        </div>
+      </section>
+
+      <section class="confirm-delivery-grid">
+        <article class="confirm-delivery-card">
+          <span class="confirm-delivery-icon">📅</span>
+          <div>
+            <h3>Entrega estimada</h3>
+            <strong id="delivery-range">—</strong>
+            <p>Te notificaremos cuando tu pedido este en camino.</p>
+          </div>
+        </article>
+        <article class="confirm-delivery-card">
+          <span class="confirm-delivery-icon">📍</span>
+          <div>
+            <h3>Direccion de envio</h3>
+            <strong id="delivery-address">—</strong>
+          </div>
+        </article>
+      </section>
+
+      <section class="confirm-cta">
+        <p>¿Quieres seguir comprando?</p>
+        <a class="btn-accent" href="catalogo.html">IR AL CATALOGO</a>
+      </section>
+    </div>
   </main>
+
+  <section class="trust-bar catalog-trust">
+    <article>
+      <strong>★ Calidad garantizada</strong>
+      <p>Materiales seleccionados para larga duracion</p>
+    </article>
+    <article>
+      <strong>✓ Pagos 100% seguros</strong>
+      <p>Multiples metodos de pago con proteccion</p>
+    </article>
+    <article>
+      <strong>🚚 Envios a todo Colombia</strong>
+      <p>Recibe tu pedido rapido y seguro</p>
+    </article>
+    <article>
+      <strong>❤ Hecho con pasion</strong>
+      <p>Disenados especialmente para ti</p>
+    </article>
+  </section>
 
   <footer class="home-footer">
     <a href="https://www.instagram.com/medix.uniformes/"><span>@medix.uniformes</span></a>
+    <span>310 123 4567</span>
     <span>Compra segura</span>
     <span>Colombia</span>
   </footer>
 
-  <script src="config.js?v=10"></script>
-  <script>
-    (async function () {
-      const cardEl = document.getElementById("payment-card");
-      const iconEl = document.getElementById("pay-icon");
-      const titleEl = document.getElementById("pay-title");
-      const messageEl = document.getElementById("pay-message");
-      const metaEl = document.getElementById("pay-meta");
-      const detailsEl = document.getElementById("pay-details");
-      const referenceEl = document.getElementById("pay-reference");
-      const amountEl = document.getElementById("pay-amount");
-      const statusEl = document.getElementById("pay-status");
-      const primaryBtn = document.getElementById("pay-primary-btn");
-      const secondaryBtn = document.getElementById("pay-secondary-btn");
-
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-
-      function setState(state, icon, title, message) {
-        cardEl.className = "payment-result-card is-" + state;
-        iconEl.textContent = icon;
-        titleEl.textContent = title;
-        messageEl.textContent = message;
-        detailsEl.classList.remove("hidden");
-      }
-
-      function formatMoney(cents) {
-        if (cents == null) return "—";
-        return "$" + (Number(cents) / 100).toLocaleString("es-CO");
-      }
-
-      if (!id) {
-        setState(
-          "error",
-          "⚠",
-          "Sin transaccion",
-          "No encontramos el ID de pago en la URL. Si ya pagaste, revisa tu correo o contactanos."
-        );
-        secondaryBtn.classList.remove("hidden");
-        return;
-      }
-
-      metaEl.textContent = "ID Wompi: " + id;
-
-      try {
-        const cfg = window.MEDIX_SUPABASE || {};
-        const isTest = String(cfg.wompiPublicKey || "").includes("pub_test_");
-        const base = isTest
-          ? "https://sandbox.wompi.co/v1/transactions/"
-          : "https://production.wompi.co/v1/transactions/";
-        const res = await fetch(base + encodeURIComponent(id));
-        const json = await res.json();
-        const tx = json?.data;
-        const status = String(tx?.status || "").toUpperCase();
-
-        referenceEl.textContent = tx?.reference || "—";
-        amountEl.textContent = formatMoney(tx?.amount_in_cents);
-        statusEl.textContent = status || "DESCONOCIDO";
-
-        if (status === "APPROVED") {
-          setState(
-            "success",
-            "✓",
-            "Pago aprobado",
-            "Gracias por tu compra. Estamos preparando tu pedido y pronto recibiras novedades."
-          );
-          primaryBtn.textContent = "Seguir comprando";
-          primaryBtn.href = "catalogo.html";
-        } else if (status === "PENDING" || status === "PENDING_PAYMENT") {
-          setState(
-            "pending",
-            "⏳",
-            "Pago en proceso",
-            "Tu pago aun no esta confirmado. Si ya completaste el pago, espera unos minutos."
-          );
-          primaryBtn.textContent = "Volver al catalogo";
-        } else if (status === "DECLINED" || status === "VOIDED") {
-          setState(
-            "error",
-            "✕",
-            "Pago no completado",
-            "La transaccion fue rechazada o cancelada. Puedes intentar de nuevo."
-          );
-          primaryBtn.textContent = "Intentar de nuevo";
-          primaryBtn.href = "catalogo.html";
-          secondaryBtn.classList.remove("hidden");
-        } else {
-          setState(
-            "pending",
-            "?",
-            "Estado: " + (status || "desconocido"),
-            "Guarda tu referencia por si necesitas ayuda."
-          );
-          secondaryBtn.classList.remove("hidden");
-        }
-
-        if (tx?.reference) {
-          metaEl.textContent = "ID Wompi: " + id;
-        }
-      } catch (err) {
-        setState(
-          "error",
-          "⚠",
-          "No se pudo verificar",
-          "Guarda el ID de la transaccion y contactanos si ya pagaste."
-        );
-        secondaryBtn.classList.remove("hidden");
-        console.error(err);
-      }
-    })();
-  </script>
+  <script src="config.js?v=11"></script>
+  <script src="pago-resultado.js?v=11"></script>
 </body>
 </html>

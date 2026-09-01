@@ -479,3 +479,72 @@ update public.orders
 set subtotal = total,
     shipping_cost = 0
 where subtotal is null;
+
+-- ---------------------------------------------------------------------------
+-- 8) Confirmación pública por referencia (página pago-resultado.html)
+-- ---------------------------------------------------------------------------
+create or replace function public.get_order_confirmation(p_reference text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order public.orders%rowtype;
+  v_items jsonb;
+begin
+  if coalesce(trim(p_reference), '') = '' then
+    return null;
+  end if;
+
+  select * into v_order
+  from public.orders
+  where wompi_reference = trim(p_reference)
+     or order_code = trim(p_reference)
+  order by created_at desc
+  limit 1;
+
+  if not found then
+    return null;
+  end if;
+
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'name', oi.product_name,
+        'quantity', oi.quantity,
+        'size', oi.size,
+        'unitPrice', oi.unit_price,
+        'lineTotal', oi.quantity * oi.unit_price,
+        'imageUrl', (
+          select pi.image_url
+          from public.product_images pi
+          where pi.product_id = oi.product_id
+          order by pi.is_primary desc, pi.sort_order asc
+          limit 1
+        )
+      )
+      order by oi.created_at
+    ),
+    '[]'::jsonb
+  )
+  into v_items
+  from public.order_items oi
+  where oi.order_id = v_order.id;
+
+  return jsonb_build_object(
+    'orderCode', v_order.order_code,
+    'createdAt', v_order.created_at,
+    'subtotal', coalesce(v_order.subtotal, v_order.total - v_order.shipping_cost),
+    'shippingCost', coalesce(v_order.shipping_cost, 0),
+    'total', v_order.total,
+    'address', v_order.customer_address,
+    'paymentStatus', v_order.payment_status,
+    'status', v_order.status,
+    'items', v_items
+  );
+end;
+$$;
+
+revoke all on function public.get_order_confirmation(text) from public;
+grant execute on function public.get_order_confirmation(text) to anon, authenticated;
