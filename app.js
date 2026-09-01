@@ -536,60 +536,38 @@ async function createWompiCheckout(customer) {
   }));
 
   const payload = { customer, items };
-  let rpcRes;
 
   try {
-    rpcRes = await fetch(`${cfg.url}/rest/v1/rpc/create_wompi_payment`, {
-      method: "POST",
-      headers: {
-        ...supabaseHeaders(),
-        Prefer: "return=representation"
-      },
-      body: JSON.stringify({ payload })
-    });
-  } catch (networkErr) {
-    throw new Error(
-      "No se pudo conectar con Supabase. Verifica tu internet, abre la tienda con Live Server (http://localhost) y que config.js tenga la URL correcta."
-    );
-  }
-
-  if (rpcRes.ok) {
-    const data = await rpcRes.json();
+    const data = await rpcCall("create_wompi_payment", { payload });
     if (data?.reference && data?.signature?.integrity) return data;
     throw new Error("Respuesta invalida al crear el pago.");
-  }
+  } catch (err) {
+    const msg = err.message || String(err);
+    const rpcError = msg.replace(/^Supabase RPC \d+: /, "");
 
-  const rpcText = await rpcRes.text();
-  let rpcError = rpcText;
-  try {
-    const parsed = JSON.parse(rpcText);
-    rpcError = parsed.message || parsed.error || parsed.hint || rpcText;
-  } catch (_) {
-    /* keep text */
-  }
+    if (/404|Could not find the function/i.test(msg)) {
+      throw new Error(
+        "Falta ejecutar supabase/phase1-payments.sql en Supabase SQL Editor. Proyecto: joywqacbtmgfjncmglks.supabase.co"
+      );
+    }
 
-  if (rpcRes.status === 404 || /Could not find the function/i.test(rpcError)) {
+    if (/Wompi no esta configurado/i.test(rpcError)) {
+      throw new Error(
+        "Wompi no esta configurado. Ejecuta set_wompi_secrets(...) en Supabase SQL Editor."
+      );
+    }
+
+    if (/integridad|integrity|firma|signature/i.test(rpcError)) {
+      throw new Error(
+        "Error de firma Wompi. Verifica que usaste prod_integrity_... (no prv_prod_...) en set_wompi_secrets."
+      );
+    }
+
     throw new Error(
-      "Falta ejecutar supabase/phase1-payments.sql en Supabase SQL Editor. Proyecto: joywqacbtmgfjncmglks.supabase.co"
+      rpcError ||
+        "No se pudo crear el pago. Revisa phase1-payments.sql y set_wompi_secrets en Supabase."
     );
   }
-
-  if (/Wompi no esta configurado/i.test(rpcError)) {
-    throw new Error(
-      "Wompi no esta configurado. Ejecuta set_wompi_secrets(...) en Supabase SQL Editor."
-    );
-  }
-
-  if (/integridad|integrity|firma|signature/i.test(rpcError)) {
-    throw new Error(
-      "Error de firma Wompi. Verifica que usaste prod_integrity_... (no prv_prod_...) en set_wompi_secrets."
-    );
-  }
-
-  throw new Error(
-    rpcError ||
-      "No se pudo crear el pago. Revisa phase1-payments.sql y set_wompi_secrets en Supabase."
-  );
 }
 
 function openWompiWidget(checkoutData) {
