@@ -50,23 +50,26 @@ Ejemplo: productos $150.000 + envío $9.900 → Wompi cobra **$159.900** (`15990
 
 ## Webhook (obligatorio para producción)
 
+Guia paso a paso: [`README-webhook.md`](README-webhook.md)
+
+URL para Wompi:
+
+```
+https://joywqacbtmgfjncmglks.supabase.co/functions/v1/wompi-webhook
+```
+
 1. Despliega la Edge Function:
 
 ```bash
-supabase functions deploy wompi-webhook --no-verify-jwt
+npx supabase login
+npx supabase link --project-ref joywqacbtmgfjncmglks
+npx supabase functions deploy wompi-webhook --no-verify-jwt
 ```
 
-2. Agrega el secret en Supabase → Edge Functions → Secrets:
+2. El secreto de eventos se lee de la BD (`set_wompi_secrets` con `prod_events_...`).
+   Opcional: `WOMPI_EVENTS_SECRET` en Edge Functions → Secrets.
 
-```
-WOMPI_EVENTS_SECRET=events_TU_SECRETO
-```
-
-3. En Wompi → Eventos, configura la URL:
-
-```
-https://TU_PROJECT_REF.supabase.co/functions/v1/wompi-webhook
-```
+3. En Wompi → Desarrolladores → **URL de Eventos**, pega la URL de arriba.
 
 ### Flujo automático
 

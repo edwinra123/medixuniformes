@@ -598,3 +598,17 @@ $$;
 
 revoke all on function public.diagnose_wompi_config() from public;
 grant execute on function public.diagnose_wompi_config() to anon, authenticated;
+
+-- Solo service_role (Edge Function webhook)
+create or replace function public.get_wompi_events_secret()
+returns text
+language sql
+stable
+security definer
+set search_path = public, private
+as $$
+  select events_secret from private.wompi_settings where id = 1;
+$$;
+
+revoke all on function public.get_wompi_events_secret() from public;
+grant execute on function public.get_wompi_events_secret() to service_role;

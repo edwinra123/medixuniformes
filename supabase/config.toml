@@ -1,0 +1,5 @@
+# Medix Uniformes — Supabase local config (Edge Functions)
+project_id = "joywqacbtmgfjncmglks"
+
+[functions.wompi-webhook]
+verify_jwt = false

@@ -83,7 +83,15 @@ Deno.serve(async (req) => {
     }
 
     const payload = (await req.json()) as Record<string, unknown>;
-    const eventsSecret = Deno.env.get("WOMPI_EVENTS_SECRET") || "";
+    let eventsSecret = Deno.env.get("WOMPI_EVENTS_SECRET") || "";
+
+    if (!eventsSecret) {
+      const supabaseForSecret = createClient(supabaseUrl, serviceKey);
+      const { data: secretFromDb } = await supabaseForSecret.rpc(
+        "get_wompi_events_secret",
+      );
+      eventsSecret = String(secretFromDb || "");
+    }
 
     if (eventsSecret) {
       const valid = await validateWompiChecksum(payload, eventsSecret);
