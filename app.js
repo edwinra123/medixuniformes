@@ -523,6 +523,12 @@ async function createWompiCheckout(customer) {
     throw new Error("Falta configurar Supabase (url / anonKey) en config.js");
   }
 
+  if (window.location.protocol === "file:") {
+    throw new Error(
+      "Abre la tienda con Live Server o python -m http.server. No funciona abriendo el archivo HTML directamente."
+    );
+  }
+
   const items = cart.map((item) => ({
     id: item.id,
     quantity: item.quantity || 1,
@@ -530,16 +536,22 @@ async function createWompiCheckout(customer) {
   }));
 
   const payload = { customer, items };
+  let rpcRes;
 
-  // Preferido: RPC en Postgres (no requiere Edge Function)
-  const rpcRes = await fetch(`${cfg.url}/rest/v1/rpc/create_wompi_payment`, {
-    method: "POST",
-    headers: {
-      ...supabaseHeaders(),
-      Prefer: "return=representation"
-    },
-    body: JSON.stringify({ payload })
-  });
+  try {
+    rpcRes = await fetch(`${cfg.url}/rest/v1/rpc/create_wompi_payment`, {
+      method: "POST",
+      headers: {
+        ...supabaseHeaders(),
+        Prefer: "return=representation"
+      },
+      body: JSON.stringify({ payload })
+    });
+  } catch (networkErr) {
+    throw new Error(
+      "No se pudo conectar con Supabase. Verifica tu internet, abre la tienda con Live Server (http://localhost) y que config.js tenga la URL correcta."
+    );
+  }
 
   if (rpcRes.ok) {
     const data = await rpcRes.json();
@@ -556,31 +568,27 @@ async function createWompiCheckout(customer) {
     /* keep text */
   }
 
-  // Si la RPC no existe aun, intentar Edge Function (opcional)
   if (rpcRes.status === 404 || /Could not find the function/i.test(rpcError)) {
-    const base = getFunctionsBaseUrl();
-    const res = await fetch(`${base}/create-wompi-payment`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cfg.anonKey}`,
-        apikey: cfg.anonKey
-      },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(
-        data.error ||
-          `Edge Function no disponible (${res.status}). Ejecuta supabase/wompi-rpc.sql en Supabase.`
-      );
-    }
-    return data;
+    throw new Error(
+      "Falta ejecutar supabase/phase1-payments.sql en Supabase SQL Editor."
+    );
+  }
+
+  if (/Wompi no esta configurado/i.test(rpcError)) {
+    throw new Error(
+      "Wompi no esta configurado. Ejecuta set_wompi_secrets(...) en Supabase SQL Editor."
+    );
+  }
+
+  if (/integridad|integrity|firma|signature/i.test(rpcError)) {
+    throw new Error(
+      "Error de firma Wompi. Verifica que usaste prod_integrity_... (no prv_prod_...) en set_wompi_secrets."
+    );
   }
 
   throw new Error(
     rpcError ||
-      "No se pudo crear el pago. Ejecuta payments.sql + wompi-rpc.sql y configura set_wompi_secrets."
+      "No se pudo crear el pago. Revisa phase1-payments.sql y set_wompi_secrets en Supabase."
   );
 }
 
@@ -863,7 +871,7 @@ if (checkoutForm && paymentMethodEl && orderResultEl) {
       orderResultEl.innerHTML = `
         <h3>No se pudo iniciar el pago</h3>
         <p>${err.message || err}</p>
-        <p>Revisa que la Edge Function <code>create-wompi-payment</code> este desplegada y con secretos Wompi.</p>
+        <p class="payment-help">Checklist: Live Server activo · phase1-payments.sql ejecutado · set_wompi_secrets con prod_integrity_...</p>
       `;
     } finally {
       if (checkoutSubmitEl) {
