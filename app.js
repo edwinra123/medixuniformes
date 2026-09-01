@@ -577,12 +577,21 @@ function openWompiWidget(checkoutData) {
       return;
     }
 
+    const integritySig =
+      checkoutData?.signature?.integrity ||
+      (typeof checkoutData?.signature === "string" ? checkoutData.signature : "");
+
+    if (!integritySig) {
+      reject(new Error("No se recibio la firma de integridad desde Supabase."));
+      return;
+    }
+
     const config = {
       currency: checkoutData.currency || "COP",
-      amountInCents: checkoutData.amountInCents,
+      amountInCents: Math.round(Number(checkoutData.amountInCents)),
       reference: checkoutData.reference,
       publicKey: checkoutData.publicKey,
-      signature: checkoutData.signature
+      signature: { integrity: integritySig }
     };
 
     if (checkoutData.redirectUrl) config.redirectUrl = checkoutData.redirectUrl;

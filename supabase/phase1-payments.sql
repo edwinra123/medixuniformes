@@ -66,6 +66,14 @@ begin
     raise exception 'public_key e integrity_secret son obligatorios';
   end if;
 
+  if trim(p_integrity_secret) like 'prv_%' then
+    raise exception 'Usaste la llave PRIVADA (prv_prod_...). Debes usar prod_integrity_... de Wompi';
+  end if;
+
+  if trim(p_integrity_secret) not like '%\_integrity\_%' escape '\' then
+    raise exception 'integrity_secret debe ser prod_integrity_... o test_integrity_...';
+  end if;
+
   insert into private.wompi_settings (
     id, public_key, integrity_secret, redirect_url, shipping_cost, events_secret, updated_at
   )
@@ -548,3 +556,45 @@ $$;
 
 revoke all on function public.get_order_confirmation(text) from public;
 grant execute on function public.get_order_confirmation(text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 9) Diagnostico publico de config Wompi (sin exponer secretos)
+-- ---------------------------------------------------------------------------
+create or replace function public.diagnose_wompi_config()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public, private
+as $$
+declare
+  v private.wompi_settings%rowtype;
+begin
+  select * into v from private.wompi_settings where id = 1;
+  if not found then
+    return jsonb_build_object(
+      'ok', false,
+      'error', 'Sin configuracion. Ejecuta set_wompi_secrets(...)'
+    );
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'publicKeyPrefix', left(v.public_key, 16),
+    'publicKeyLooksValid', v.public_key like 'pub_%',
+    'integrityFormat', case
+      when v.integrity_secret like 'prod_integrity_%' then 'prod_integrity'
+      when v.integrity_secret like 'test_integrity_%' then 'test_integrity'
+      when v.integrity_secret like 'prv_%' then 'PRIVADA_INCORRECTA'
+      else 'FORMATO_DESCONOCIDO'
+    end,
+    'integrityLength', length(v.integrity_secret),
+    'integrityLengthOk', length(v.integrity_secret) >= 45,
+    'redirectUrl', v.redirect_url,
+    'shippingCost', v.shipping_cost
+  );
+end;
+$$;
+
+revoke all on function public.diagnose_wompi_config() from public;
+grant execute on function public.diagnose_wompi_config() to anon, authenticated;
