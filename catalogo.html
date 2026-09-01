@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medix Uniformes | Catalogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="catalog-page">
+  <div class="announce-bar">
+    Envios a toda Colombia · Pagos seguros · Calidad premium
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="logo">Medix</span>
+      <span class="brand-sub">.UNIFORMES</span>
+    </a>
+    <nav class="home-nav">
+      <a href="index.html">Inicio</a>
+      <a class="is-active" href="catalogo.html">Catalogo</a>
+      <a href="index.html#nosotros">Nosotras</a>
+      <a href="index.html#envios">Envios</a>
+      <a href="index.html#contacto">Contacto</a>
+    </nav>
+    <div class="home-actions">
+      <a class="icon-link account-link" href="cuenta.html" aria-label="Iniciar sesion o registrarse" title="Mi cuenta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5 19.5c1.2-3.2 3.7-5 7-5s5.8 1.8 7 5"/>
+        </svg>
+      </a>
+      <a class="icon-link" href="#catalogo" aria-label="Buscar">⌕</a>
+      <button id="cart-toggle" class="icon-link cart-link" type="button" aria-label="Carrito">
+        👜
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="catalog-main">
+    <div class="catalog-head">
+      <h1 class="catalog-title">Catalogo</h1>
+      <p class="catalog-breadcrumb">Inicio &gt; Catalogo</p>
+    </div>
+
+    <div class="catalog-layout">
+      <aside class="catalog-filters">
+        <div class="filter-block">
+          <h3 class="filter-title">Categorias</h3>
+          <ul class="filter-list">
+            <li><button class="filter-link is-active" type="button">Todos <span>0</span></button></li>
+            <li><button class="filter-link" type="button">Sets clinicos <span>0</span></button></li>
+            <li><button class="filter-link" type="button">Blusas <span>0</span></button></li>
+            <li><button class="filter-link" type="button">Pantalones <span>0</span></button></li>
+            <li><button class="filter-link" type="button">Conjuntos premium <span>0</span></button></li>
+          </ul>
+        </div>
+
+        <div class="filter-block">
+          <h3 class="filter-title">Colores</h3>
+          <ul class="filter-colors">
+            <li><span class="swatch" style="background:#e91e8c;"></span> Fucsia <em>0</em></li>
+            <li><span class="swatch" style="background:#9caf88;"></span> Verde menta <em>0</em></li>
+            <li><span class="swatch" style="background:#7eb6d9;"></span> Azul cielo <em>0</em></li>
+            <li><span class="swatch" style="background:#a85d4b;"></span> Terracota <em>0</em></li>
+            <li><span class="swatch" style="background:#d4a843;"></span> Mostaza <em>0</em></li>
+          </ul>
+        </div>
+
+        <div class="filter-block">
+          <h3 class="filter-title">Tallas</h3>
+          <div class="size-grid">
+            <button type="button">XS</button>
+            <button type="button">S</button>
+            <button type="button">M</button>
+            <button type="button">L</button>
+            <button type="button">XL</button>
+            <button type="button">XXL</button>
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <h3 class="filter-title">Precio</h3>
+          <div class="price-range">
+            <div class="price-track"></div>
+            <div class="price-labels">
+              <span>$89.900</span>
+              <span>$149.900</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section id="catalogo" class="catalog-products">
+        <div class="catalog-toolbar">
+          <p id="catalog-count">Mostrando productos</p>
+          <div class="catalog-toolbar-right">
+            <label class="sort-label">
+              <select id="catalog-sort">
+                <option>Mas vendidos</option>
+                <option>Precio: menor a mayor</option>
+                <option>Precio: mayor a menor</option>
+                <option>Nombre A-Z</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div id="product-list" class="catalog-grid"></div>
+
+        <div class="catalog-pagination" id="catalog-pagination" hidden>
+          <button type="button" class="page-btn page-nav" aria-label="Anterior">‹</button>
+          <button type="button" class="page-btn is-active">1</button>
+          <button type="button" class="page-btn">2</button>
+          <button type="button" class="page-btn">3</button>
+          <button type="button" class="page-btn">4</button>
+          <button type="button" class="page-btn page-nav" aria-label="Siguiente">›</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="trust-bar catalog-trust">
+      <article>
+        <strong>★ Calidad garantizada</strong>
+        <p>Materiales seleccionados para larga duracion</p>
+      </article>
+      <article>
+        <strong>✓ Pagos 100% seguros</strong>
+        <p>Multiples metodos de pago con proteccion</p>
+      </article>
+      <article>
+        <strong>🚚 Envios a todo Colombia</strong>
+        <p>Recibe tu pedido rapido y seguro</p>
+      </article>
+      <article>
+        <strong>❤ Hecho con pasion</strong>
+        <p>Disenados especialmente para ti</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="home-footer" id="contacto">
+    <a href="https://www.instagram.com/medix.uniformes/"><span>@medix.uniformes</span></a>
+    <span>310 123 4567</span>
+    <span>Compra segura</span>
+    <span>Todos los medios de pago</span>
+    <span>Colombia</span>
+  </footer>
+
+  <div id="cart-overlay" class="cart-overlay"></div>
+  <aside id="checkout-panel" class="checkout-panel" aria-hidden="true">
+    <div class="checkout-header">
+      <h2>Finalizar compra</h2>
+      <button id="cart-close" class="panel-close-x" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <section class="checkout-block">
+      <h3 class="checkout-section-title">Tu pedido</h3>
+      <div id="cart-items" class="cart-items"></div>
+      <p id="cart-empty" class="cart-empty-msg">No hay productos en el carrito.</p>
+    </section>
+
+    <form id="checkout-form" class="checkout-form">
+      <section class="checkout-block">
+        <h3 class="checkout-section-title">Datos de contacto</h3>
+        <label for="fullName">Nombre completo</label>
+        <input id="fullName" name="fullName" required autocomplete="name" placeholder="Tu nombre">
+
+        <label for="phone">WhatsApp</label>
+        <div class="phone-field">
+          <span class="phone-prefix" aria-hidden="true">🇨🇴 +57</span>
+          <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="300 123 4567">
+        </div>
+
+        <label for="email">Correo electronico</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com">
+      </section>
+
+      <section class="checkout-block">
+        <h3 class="checkout-section-title">Direccion de entrega</h3>
+        <label for="address">Direccion</label>
+        <input id="address" name="address" required autocomplete="street-address" placeholder="Calle, numero, barrio">
+
+        <div class="checkout-row">
+          <div>
+            <label for="city">Ciudad</label>
+            <select id="city" name="city" required autocomplete="address-level2">
+              <option value="Bogota">Bogota</option>
+              <option value="Medellin">Medellin</option>
+              <option value="Cali">Cali</option>
+              <option value="Barranquilla">Barranquilla</option>
+              <option value="Cartagena">Cartagena</option>
+              <option value="Bucaramanga">Bucaramanga</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+          <div>
+            <label for="region">Departamento</label>
+            <select id="region" name="region" required autocomplete="address-level1">
+              <option value="Cundinamarca">Cundinamarca</option>
+              <option value="Antioquia">Antioquia</option>
+              <option value="Valle del Cauca">Valle del Cauca</option>
+              <option value="Atlantico">Atlantico</option>
+              <option value="Bolivar">Bolivar</option>
+              <option value="Santander">Santander</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="notes">Notas (opcional)</label>
+        <textarea id="notes" name="notes" rows="2" placeholder="Instrucciones de entrega, referencias..."></textarea>
+      </section>
+
+      <section class="checkout-block">
+        <h3 class="checkout-section-title">Metodo de pago</h3>
+        <label class="sr-only" for="paymentMethod">Metodo de pago</label>
+        <div class="payment-select-wrap">
+          <span class="payment-wompi-logo" aria-hidden="true">wompi</span>
+          <select id="paymentMethod" name="paymentMethod" required>
+            <option value="wompi">Pago en linea (Wompi)</option>
+            <option value="cash_on_delivery">Contraentrega (WhatsApp)</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="checkout-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0</span>
+        </div>
+        <div class="summary-row">
+          <span>Envio</span>
+          <span id="cart-shipping">$9.900</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span id="cart-total">$0</span>
+        </div>
+      </div>
+
+      <button type="submit" id="checkout-submit" class="btn-wompi">PAGAR CON WOMPI</button>
+      <p class="checkout-trust">Pago 100% seguro procesado por Wompi</p>
+    </form>
+
+    <div id="order-result" class="order-result hidden"></div>
+  </aside>
+
+  <div id="product-modal" class="product-modal hidden">
+    <div class="product-modal-backdrop" id="product-modal-backdrop"></div>
+    <article class="product-modal-content">
+      <button id="product-modal-close" class="product-modal-close" type="button">✕</button>
+      <div class="product-modal-layout">
+        <div class="product-gallery">
+          <div id="product-thumbs" class="product-thumbs"></div>
+          <img id="product-main-image" class="product-main-image" src="" alt="Producto Medix">
+        </div>
+        <div class="product-detail">
+          <h3 id="product-detail-name"></h3>
+          <p class="price-row"><span class="old-price hidden" id="product-detail-old-price"></span> <strong id="product-detail-price"></strong></p>
+          <p class="shipping-note">+ Envio gratis en compras seleccionadas</p>
+          <div class="swatches" id="product-swatches">
+            <span style="background:#e91e8c;"></span>
+            <span style="background:#9caf88;"></span>
+            <span style="background:#7eb6d9;"></span>
+            <span style="background:#a85d4b;"></span>
+            <span style="background:#1f2a44;"></span>
+            <span style="background:#f0f0f0;border:1px solid #ddd;"></span>
+          </div>
+          <div class="sizes" id="product-detail-sizes"></div>
+          <div class="buy-row">
+            <input id="product-qty" type="number" min="1" value="1">
+            <button id="product-detail-add" type="button">Agregar al carrito</button>
+          </div>
+          <div class="safe-checkout">Compra segura · VISA · MC · AMEX</div>
+          <p class="product-description" id="product-detail-description"></p>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <script src="https://checkout.wompi.co/widget.js"></script>
+  <script src="config.js?v=9"></script>
+  <script src="app.js?v=9"></script>
+</body>
+</html>

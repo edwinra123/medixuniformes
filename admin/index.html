@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medix Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="login-view" class="login-view">
+    <div class="login-card">
+      <p class="brand">Medix Admin</p>
+      <h1 id="auth-title">Iniciar sesion</h1>
+      <p class="muted" id="auth-subtitle">Acceso al panel de administracion</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab is-active" data-auth="login">Iniciar sesion</button>
+        <button type="button" class="auth-tab" data-auth="register">Registrarse</button>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <label>Email</label>
+        <input id="login-email" type="email" required placeholder="admin@medix.com" autocomplete="username">
+        <label>Contrasena</label>
+        <input id="login-password" type="password" required minlength="6" autocomplete="current-password">
+        <button type="submit">Entrar</button>
+      </form>
+
+      <form id="register-form" class="auth-form hidden">
+        <label>Nombre</label>
+        <input id="register-name" type="text" required placeholder="Tu nombre">
+        <label>Email</label>
+        <input id="register-email" type="email" required placeholder="tu@correo.com" autocomplete="email">
+        <label>Contrasena</label>
+        <input id="register-password" type="password" required minlength="6" autocomplete="new-password">
+        <button type="submit">Crear cuenta</button>
+        <p class="hint">Los correos admin se configuran en <code>admin/config.js</code> (lista <code>adminEmails</code>).</p>
+      </form>
+
+      <p id="login-error" class="error hidden"></p>
+      <p id="login-ok" class="ok hidden"></p>
+      <p class="hint">Si no ves nada, abre <code>admin/index.html</code> (no el catalogo).</p>
+    </div>
+  </div>
+
+  <div id="app-view" class="app-view hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">Medix Admin</div>
+      <nav>
+        <button data-view="dashboard" class="nav-btn is-active" type="button">Inicio</button>
+        <button data-view="products" class="nav-btn" type="button">Productos</button>
+        <button data-view="inventory" class="nav-btn" type="button">Inventario</button>
+        <button data-view="orders" class="nav-btn" type="button">Pedidos</button>
+      </nav>
+      <a class="store-link" href="../index.html">Ver tienda</a>
+      <button id="logout-btn" class="logout-btn" type="button">Cerrar sesion</button>
+    </aside>
+
+    <main class="content">
+      <header class="top">
+        <h2 id="view-title">Dashboard</h2>
+        <p id="admin-email" class="muted"></p>
+      </header>
+
+      <section id="view-dashboard" class="view">
+        <div class="stats">
+          <article><p>Productos</p><strong id="stat-products">0</strong></article>
+          <article><p>Stock bajo (&lt; 10)</p><strong id="stat-low-stock">0</strong></article>
+          <article><p>Pedidos</p><strong id="stat-orders">0</strong></article>
+          <article><p>Unidades vendidas</p><strong id="stat-units">0</strong></article>
+        </div>
+        <div class="panel">
+          <h3>Top vendidos</h3>
+          <div id="top-sales" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="view-products" class="view hidden">
+        <div class="panel-head">
+          <div>
+            <h3>Productos</h3>
+            <p id="products-summary" class="muted">Cargando desde la base de datos...</p>
+          </div>
+          <div class="panel-head-actions">
+            <button id="refresh-products-btn" type="button" class="ghost">Actualizar</button>
+            <button id="new-product-btn" type="button">+ Nuevo producto</button>
+          </div>
+        </div>
+        <div id="products-table" class="table-wrap"></div>
+      </section>
+
+      <section id="view-inventory" class="view hidden">
+        <div class="panel">
+          <h3>Ajustar existencias</h3>
+          <form id="inventory-form" class="form-grid">
+            <label>Producto
+              <select id="inv-product" required></select>
+            </label>
+            <label>Cambio de stock (+/-)
+              <input id="inv-qty" type="number" required placeholder="Ej: -2 o 5">
+            </label>
+            <label>Motivo
+              <select id="inv-reason">
+                <option value="ajuste">Ajuste</option>
+                <option value="entrada">Entrada / compra</option>
+                <option value="salida">Salida / dano</option>
+                <option value="venta">Venta manual</option>
+              </select>
+            </label>
+            <label>Nota
+              <input id="inv-note" type="text" placeholder="Opcional">
+            </label>
+            <button type="submit">Registrar movimiento</button>
+          </form>
+          <p id="inv-msg" class="muted"></p>
+        </div>
+        <div class="panel">
+          <h3>Ultimos movimientos</h3>
+          <div id="movements-table" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="view-orders" class="view hidden">
+        <div class="panel">
+          <h3>Pedidos / compras</h3>
+          <div id="orders-table" class="table-wrap"></div>
+        </div>
+        <div class="panel">
+          <h3>Cantidad comprada por producto</h3>
+          <div id="sales-table" class="table-wrap"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="product-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal></div>
+    <form id="product-form" class="modal-card modal-card-wide">
+      <h3 id="product-modal-title">Detalles de producto</h3>
+      <input type="hidden" id="product-id">
+
+      <div class="form-two-col">
+        <label>Nombre
+          <input id="product-name" type="text" required placeholder="Ej: Set Fucsia">
+        </label>
+        <label>Color
+          <input id="product-color" type="text" placeholder="Ej: fucsia">
+        </label>
+      </div>
+
+      <label>Descripcion
+        <textarea id="product-description" rows="3" placeholder="Comodidad y estilo para cada turno."></textarea>
+      </label>
+
+      <div class="form-two-col">
+        <label>Categoria
+          <select id="product-category">
+            <option value="">Sin categoria</option>
+          </select>
+        </label>
+        <label>Material
+          <input id="product-material" type="text" value="Tela Antifluido">
+        </label>
+      </div>
+
+      <div class="form-two-col">
+        <label>Precio
+          <input id="product-price" type="number" min="0" step="100" required>
+        </label>
+        <label>Precio tachado (opcional)
+          <input id="product-compare" type="number" min="0" step="100">
+        </label>
+      </div>
+
+      <fieldset class="size-fieldset">
+        <legend>Disponibilidad de tallas</legend>
+        <p class="hint muted">Marca las tallas disponibles e indica el stock de cada una.</p>
+        <div id="product-sizes" class="size-availability">
+          <!-- filled by JS -->
+        </div>
+        <p class="muted">Stock total: <strong id="product-stock-total">0</strong></p>
+      </fieldset>
+
+      <fieldset class="gallery-fieldset">
+        <legend>Galeria de fotos</legend>
+        <p class="hint muted">Las fotos se guardan en la tabla <code>product_images</code> de Supabase.</p>
+        <div id="product-images-preview" class="images-gallery"></div>
+        <label class="add-photo-btn">
+          <input id="product-files" type="file" accept="image/*" multiple hidden>
+          <span>+ Anadir foto</span>
+        </label>
+      </fieldset>
+
+      <label class="check">
+        <input id="product-active" type="checkbox" checked>
+        Activo en catalogo
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" data-close-modal class="ghost">Cancelar</button>
+        <button type="submit">Guardar producto</button>
+      </div>
+      <p id="product-form-error" class="error hidden"></p>
+    </form>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

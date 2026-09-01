@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medix Uniformes | Resultado del pago</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="home-page">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="logo">Medix</span>
+      <span class="brand-sub">.UNIFORMES</span>
+    </a>
+    <nav class="home-nav">
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Catalogo</a>
+    </nav>
+  </header>
+
+  <main class="payment-result">
+    <h1 id="pay-title">Verificando pago...</h1>
+    <p id="pay-message">Estamos confirmando tu transaccion con Wompi.</p>
+    <p id="pay-meta" class="payment-meta"></p>
+    <a class="cta-btn" href="catalogo.html">Volver al catalogo</a>
+  </main>
+
+  <script src="config.js?v=7"></script>
+  <script>
+    (async function () {
+      const titleEl = document.getElementById("pay-title");
+      const messageEl = document.getElementById("pay-message");
+      const metaEl = document.getElementById("pay-meta");
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      if (!id) {
+        titleEl.textContent = "Sin transaccion";
+        messageEl.textContent = "No encontramos el id de pago en la URL.";
+        return;
+      }
+
+      metaEl.textContent = "ID Wompi: " + id;
+
+      try {
+        const cfg = window.MEDIX_SUPABASE || {};
+        const isTest = String(cfg.wompiPublicKey || "").includes("pub_test_");
+        const base = isTest
+          ? "https://sandbox.wompi.co/v1/transactions/"
+          : "https://production.wompi.co/v1/transactions/";
+        const res = await fetch(base + encodeURIComponent(id));
+        const json = await res.json();
+        const tx = json?.data;
+        const status = String(tx?.status || "").toUpperCase();
+
+        if (status === "APPROVED") {
+          titleEl.textContent = "Pago aprobado";
+          messageEl.textContent =
+            "Gracias por tu compra. Referencia: " + (tx.reference || "—");
+        } else if (status === "PENDING" || status === "PENDING_PAYMENT") {
+          titleEl.textContent = "Pago en proceso";
+          messageEl.textContent =
+            "Tu pago aun no esta confirmado. Te avisaremos cuando Wompi lo apruebe.";
+        } else if (status === "DECLINED") {
+          titleEl.textContent = "Pago rechazado";
+          messageEl.textContent = "La transaccion no pudo completarse. Intenta de nuevo.";
+        } else {
+          titleEl.textContent = "Estado: " + (status || "desconocido");
+          messageEl.textContent = "Referencia: " + (tx?.reference || "—");
+        }
+
+        if (tx?.reference) {
+          metaEl.textContent =
+            "ID Wompi: " + id + " · Referencia: " + tx.reference +
+            (tx.amount_in_cents != null
+              ? " · Monto: $" + (tx.amount_in_cents / 100).toLocaleString("es-CO")
+              : "");
+        }
+      } catch (err) {
+        titleEl.textContent = "No se pudo verificar";
+        messageEl.textContent =
+          "Guarda el ID de la transaccion y contactanos si ya pagaste.";
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

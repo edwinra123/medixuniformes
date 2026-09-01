@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medix Uniformes | Mi cuenta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="account-page">
+  <div class="announce-bar">
+    Envios a toda Colombia · Pagos seguros · Calidad premium
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="logo">Medix</span>
+      <span class="brand-sub">.UNIFORMES</span>
+    </a>
+    <nav class="home-nav">
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Catalogo</a>
+      <a href="index.html#nosotros">Nosotras</a>
+      <a href="index.html#envios">Envios</a>
+      <a href="index.html#contacto">Contacto</a>
+    </nav>
+    <div class="home-actions">
+      <a class="icon-link account-link is-active" href="cuenta.html" aria-label="Mi cuenta" title="Mi cuenta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5 19.5c1.2-3.2 3.7-5 7-5s5.8 1.8 7 5"/>
+        </svg>
+      </a>
+      <a class="icon-link" href="catalogo.html" aria-label="Buscar">⌕</a>
+      <a class="icon-link cart-link" href="catalogo.html" aria-label="Carrito">
+        👜
+        <span class="cart-badge">0</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="account-main">
+    <div id="auth-panel" class="account-card">
+      <p class="account-brand">Medix</p>
+      <h1 id="auth-title">Iniciar sesion</h1>
+      <p class="account-lead" id="auth-subtitle">Accede a tu cuenta para seguir tus pedidos</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab is-active" data-auth="login">Iniciar sesion</button>
+        <button type="button" class="auth-tab" data-auth="register">Registrarse</button>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" required placeholder="tu@correo.com" autocomplete="username">
+        <label for="login-password">Contrasena</label>
+        <input id="login-password" type="password" required minlength="6" autocomplete="current-password">
+        <button type="submit">Entrar</button>
+      </form>
+
+      <form id="register-form" class="auth-form hidden">
+        <label for="register-name">Nombre</label>
+        <input id="register-name" type="text" required placeholder="Tu nombre">
+        <label for="register-email">Email</label>
+        <input id="register-email" type="email" required placeholder="tu@correo.com" autocomplete="email">
+        <label for="register-password">Contrasena</label>
+        <input id="register-password" type="password" required minlength="6" autocomplete="new-password">
+        <button type="submit">Crear cuenta</button>
+      </form>
+
+      <p id="auth-error" class="auth-msg error hidden"></p>
+      <p id="auth-ok" class="auth-msg ok hidden"></p>
+    </div>
+
+    <div id="session-panel" class="account-card hidden">
+      <p class="account-brand">Medix</p>
+      <h1>Hola</h1>
+      <p class="account-lead" id="session-lead">Ya iniciaste sesion en tu cuenta</p>
+      <p id="session-email" class="session-email"></p>
+      <p id="session-name" class="session-name"></p>
+      <p id="session-role" class="session-role hidden"></p>
+      <div class="session-actions">
+        <a id="admin-link" class="btn-accent hidden" href="admin/index.html">Ir al panel administrador</a>
+        <a class="btn-accent btn-catalog" href="catalogo.html">Ir al catalogo</a>
+        <button id="logout-btn" class="btn-ghost" type="button">Cerrar sesion</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="home-footer">
+    <a href="https://www.instagram.com/medix.uniformes/"><span>@medix.uniformes</span></a>
+    <span>310 123 4567</span>
+    <span>Compra segura</span>
+    <span>Todos los medios de pago</span>
+    <span>Colombia</span>
+  </footer>
+
+  <script src="admin/config.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
