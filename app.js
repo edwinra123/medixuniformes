@@ -1,7 +1,7 @@
 let products = [];
 const cart = [];
 const whatsappBusinessNumber = "573001112233";
-let SHIPPING_COST = 9900;
+let SHIPPING_COST = 0;
 const placeholderImage =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -570,7 +570,7 @@ async function createWompiCheckout(customer) {
 
   if (rpcRes.status === 404 || /Could not find the function/i.test(rpcError)) {
     throw new Error(
-      "Falta ejecutar supabase/phase1-payments.sql en Supabase SQL Editor."
+      "Falta ejecutar supabase/phase1-payments.sql en Supabase SQL Editor. Proyecto: joywqacbtmgfjncmglks.supabase.co"
     );
   }
 

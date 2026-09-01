@@ -30,13 +30,13 @@ create table if not exists private.wompi_settings (
   integrity_secret text not null,
   events_secret text,
   redirect_url text,
-  shipping_cost numeric(12, 2) not null default 9900 check (shipping_cost >= 0),
+  shipping_cost numeric(12, 2) not null default 0 check (shipping_cost >= 0),
   updated_at timestamptz not null default now()
 );
 
 alter table private.wompi_settings
   add column if not exists events_secret text,
-  add column if not exists shipping_cost numeric(12, 2) not null default 9900 check (shipping_cost >= 0);
+  add column if not exists shipping_cost numeric(12, 2) not null default 0 check (shipping_cost >= 0);
 
 revoke all on table private.wompi_settings from public, anon, authenticated;
 revoke all on schema private from public, anon, authenticated;
@@ -49,7 +49,7 @@ create or replace function public.set_wompi_secrets(
   p_public_key text,
   p_integrity_secret text,
   p_redirect_url text default null,
-  p_shipping_cost numeric default 9900,
+  p_shipping_cost numeric default 0,
   p_events_secret text default null
 )
 returns text
@@ -74,7 +74,7 @@ begin
     trim(p_public_key),
     trim(p_integrity_secret),
     nullif(trim(p_redirect_url), ''),
-    greatest(0, coalesce(p_shipping_cost, 9900)),
+    greatest(0, coalesce(p_shipping_cost, 0)),
     nullif(trim(p_events_secret), ''),
     now()
   )
@@ -104,7 +104,7 @@ as $$
   select jsonb_build_object(
     'shippingCost', coalesce(
       (select shipping_cost from private.wompi_settings where id = 1),
-      9900
+      0
     )
   );
 $$;
@@ -373,7 +373,7 @@ begin
     raise exception 'El subtotal debe ser mayor a 0';
   end if;
 
-  v_shipping := coalesce(v_settings.shipping_cost, 9900);
+  v_shipping := coalesce(v_settings.shipping_cost, 0);
   v_total := v_subtotal + v_shipping;
 
   v_amount_cents := round(v_total * 100)::bigint;

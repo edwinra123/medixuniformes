@@ -193,8 +193,8 @@
       els.payBadge.textContent = badge.text;
       els.payBadge.className = "confirm-pay-badge " + badge.className;
 
-      const subtotal = order?.subtotal ?? (tx.amount_in_cents ? tx.amount_in_cents / 100 - 9900 : 0);
-      const shipping = order?.shippingCost ?? 9900;
+      const subtotal = order?.subtotal ?? (tx.amount_in_cents ? tx.amount_in_cents / 100 : 0);
+      const shipping = order?.shippingCost ?? 0;
       const total = order?.total ?? tx.amount_in_cents / 100;
 
       els.subtotal.textContent = currency(Math.max(0, subtotal));
